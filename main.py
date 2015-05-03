@@ -1,6 +1,7 @@
 import urllib2
 import urllib
 import sys
+
 #isolate ID
 def fmtId(string):
     return string[1:len(string) - 1]
@@ -60,7 +61,9 @@ def listenServer(id, req):
 
         #print message and talk          
         elif 'gotMessage' in rec:
-            print(rec[16:len(rec) - 2])
+            response = rec.split('"')[1::2];
+            print(response[1])
+            #print(rec[16:len(rec) - 2])
             talk(id,req)
 
 def omegleConnect():
