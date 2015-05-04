@@ -1,7 +1,12 @@
 import urllib2
 import urllib
 import sys
+import time
 
+line = 0
+filename = 'dialog.txt'
+txt = open(filename)
+msg = txt.readlines()
 #isolate ID
 def fmtId(string):
     return string[1:len(string) - 1]
@@ -9,16 +14,24 @@ def fmtId(string):
 
 #Talk to people
 def talk(id,req):
-
+    
     #Show the server that we're typing
     typing = urllib2.urlopen('http://omegle.com/typing', '&id='+id)
     typing.close()
 
     #Show the user that we can write now
-    msg = str(raw_input('> '))
+    #msg = str(raw_input('> '))
+    global line
+    global msg
+
+    time.sleep(2)
+
+    print('> ' + msg[line].rstrip('\n'))
 
     #Send the string to the stranger ID
-    msgReq = urllib2.urlopen('http://omegle.com/send', '&msg='+msg+'&id='+id)
+    msgReq = urllib2.urlopen('http://omegle.com/send', '&msg='+msg[line]+'&id='+id)
+
+    line+=1
 
     #Close the connection
     msgReq.close()
@@ -67,6 +80,8 @@ def listenServer(id, req):
             talk(id,req)
 
 def omegleConnect():
+    global line
+    line = 0
     opener = urllib2.build_opener()
 
     ##add in the topiclist data
@@ -80,5 +95,5 @@ def omegleConnect():
     req = urllib2.Request('http://omegle.com/events', urllib.urlencode({'id':id}))
     print('Searching for users')
     listenServer(id,req)
-  
+
 omegleConnect()
