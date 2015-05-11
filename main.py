@@ -5,8 +5,10 @@ import time
 
 line = 0
 filename = 'dialog.txt'
-txt = open(filename)
-msg = txt.readlines()
+
+with open(filename, 'r') as txt:
+    msg = txt.readlines()
+
 #isolate ID
 def fmtId(string):
     return string[1:len(string) - 1]
@@ -39,11 +41,15 @@ def talk(id,req):
 
 #This is where all the magic happens, we listen constantly to the page for events
 def listenServer(id, req):
+    global line
     while True:
         site = urllib2.urlopen(req)
 
         #We read the HTTP output to get what's going on
         rec = site.read()
+        
+        # #for debugging purposes
+        # print(rec)
 
         if 'waiting' in rec:
             print("Waiting...")
@@ -58,17 +64,18 @@ def listenServer(id, req):
                     print('You are temporarily banned: Suspected by antinudeservers')
                     sys.exit('');
             #other possible errors
-
-        elif 'connected' in rec:
-            print('Connected')
-            print(id)
-            talk(id,req)
             
         elif 'strangerDisconnected' in rec:
             print('Stranger Disconnected')
             #restart
+            line = 0
             omegleConnect()
             
+        elif 'connected' in rec:
+            print('Connected')
+            print(id)
+            talk(id,req)
+
         elif 'typing' in rec:
             print("Stranger is typing...")
 
@@ -80,8 +87,7 @@ def listenServer(id, req):
             talk(id,req)
 
 def omegleConnect():
-    global line
-    line = 0
+    
     opener = urllib2.build_opener()
 
     ##add in the topiclist data
